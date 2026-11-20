@@ -159,6 +159,11 @@ fun DrivingModeSettingsScreen(
                 label = stringResource(R.string.driving_mode_speed_unit_mph_label),
                 description = stringResource(R.string.driving_mode_speed_unit_mph_description),
             )
+            SwitchPreference(
+                adapter = prefs2.drivingModeStayAwake.getAdapter(),
+                label = stringResource(R.string.driving_mode_stay_awake_label),
+                description = stringResource(R.string.driving_mode_stay_awake_description),
+            )
         }
     }
 }

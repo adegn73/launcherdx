@@ -287,6 +287,11 @@ class PreferenceManager2 @Inject constructor(
         defaultValue = false,
     )
 
+    val drivingModeStayAwake = preference(
+        key = booleanPreferencesKey(name = "driving_mode_stay_awake"),
+        defaultValue = false,
+    )
+
     val appDrawerSearchBarBackground = preference(
         key = booleanPreferencesKey(name = "all_apps_search_bar_background"),
         defaultValue = context.resources.getBoolean(R.bool.config_default_search_bar_background),

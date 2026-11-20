@@ -314,6 +314,8 @@ public class Launcher extends StatefulActivity<LauncherState>
      */
     protected static final int REQUEST_LAST = 100;
 
+    private static final int REQUEST_CONFIRM_HOME_SCREEN_UNLOCK = REQUEST_LAST + 1;
+
     public static final String INTENT_ACTION_ALL_APPS_TOGGLE =
             "launcher.intent_action_all_apps_toggle";
 
@@ -395,6 +397,9 @@ public class Launcher extends StatefulActivity<LauncherState>
     private PendingRequestArgs mPendingRequestArgs;
     // Request id for any pending activity result
     protected int mPendingActivityRequestCode = -1;
+
+    // Lawnchair: callback to run once REQUEST_CONFIRM_HOME_SCREEN_UNLOCK comes back RESULT_OK.
+    private Runnable mPendingHomeScreenUnlockCallback;
 
     private ViewGroupFocusHelper mFocusHandler;
 
@@ -944,8 +949,36 @@ public class Launcher extends StatefulActivity<LauncherState>
     @Override
     public void onActivityResult(
             final int requestCode, final int resultCode, final Intent data) {
+        if (requestCode == REQUEST_CONFIRM_HOME_SCREEN_UNLOCK) {
+            Runnable callback = mPendingHomeScreenUnlockCallback;
+            mPendingHomeScreenUnlockCallback = null;
+            if (resultCode == RESULT_OK && callback != null) {
+                callback.run();
+            }
+            return;
+        }
         mPendingActivityRequestCode = -1;
         handleActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Lawnchair: Prompts the user to confirm their current device unlock method (biometric,
+     * PIN, pattern, or password - whatever is set up) before running {@param onConfirmed}. If
+     * the device has no secure lock screen set up, there is nothing to confirm against, so
+     * {@param onConfirmed} runs immediately.
+     */
+    public void confirmDeviceCredential(Runnable onConfirmed) {
+        android.app.KeyguardManager keyguardManager =
+                getSystemService(android.app.KeyguardManager.class);
+        Intent intent = keyguardManager == null
+                ? null
+                : keyguardManager.createConfirmDeviceCredentialIntent(null, null);
+        if (intent == null) {
+            onConfirmed.run();
+            return;
+        }
+        mPendingHomeScreenUnlockCallback = onConfirmed;
+        startActivityForResult(intent, REQUEST_CONFIRM_HOME_SCREEN_UNLOCK);
     }
 
     /**

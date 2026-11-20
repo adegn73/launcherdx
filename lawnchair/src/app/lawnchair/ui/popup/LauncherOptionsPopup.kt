@@ -17,7 +17,7 @@ import com.patrykmichalik.opto.core.setBlocking
 object LauncherOptionsPopup {
     val DEFAULT_ORDER = listOf(
         LauncherOptionPopupItem("carousel", true),
-        LauncherOptionPopupItem("lock", false),
+        LauncherOptionPopupItem("lock", true),
         LauncherOptionPopupItem("edit_mode", false),
         LauncherOptionPopupItem("wallpaper", true),
         LauncherOptionPopupItem("widgets", true),
@@ -137,20 +137,18 @@ object LauncherOptionsPopup {
         )
 
         val options = ArrayList<OptionItem>()
-        optionOrder
-            .filter {
-                (it.isEnabled && it.identifier != "carousel")
-            }
-            .filter {
-                if (lockHomeScreen) {
-                    it.identifier != "edit_mode" && it.identifier != "widgets"
-                } else {
-                    true
-                }
-            }
-            .filter { it.identifier != "default_page" || !launcher.workspace.isCurrentPageDefault }
-            .mapNotNull { optionsList[it.identifier] }
-            .forEach { options.add(it) }
+        if (lockHomeScreen) {
+            // Locked means "no changes" - show only the unlock action itself, regardless of
+            // whether "lock" is enabled/ordered in the user's popup menu, since it's the only
+            // way out of the locked state.
+            optionsList.getValue("lock").let { options.add(it) }
+        } else {
+            optionOrder
+                .filter { it.isEnabled && it.identifier != "carousel" }
+                .filter { it.identifier != "default_page" || !launcher.workspace.isCurrentPageDefault }
+                .mapNotNull { optionsList[it.identifier] }
+                .forEach { options.add(it) }
+        }
 
         return options
     }

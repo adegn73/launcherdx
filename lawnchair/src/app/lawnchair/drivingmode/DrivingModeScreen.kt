@@ -12,6 +12,7 @@ import android.location.LocationManager
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -98,6 +99,7 @@ fun DrivingModeScreen(
         val backgroundColorOption by prefs2.drivingModeBackgroundColor.asState()
         val backgroundImageFileName by prefs2.drivingModeBackgroundImage.asState()
         val backgroundOpacity by prefs2.drivingModeBackgroundOpacity.asState()
+        val stayAwake by prefs2.drivingModeStayAwake.asState()
 
         val repository = remember { DrivingModeButtonRepository.INSTANCE.get(context) }
         val assignments by repository.assignments.collectAsStateWithLifecycle()
@@ -156,6 +158,15 @@ fun DrivingModeScreen(
         }
         LaunchedEffect(scrimColor) {
             launcher.window?.navigationBarColor = scrimColor.toArgb()
+        }
+
+        DisposableEffect(stayAwake) {
+            if (stayAwake) {
+                launcher.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+            onDispose {
+                launcher.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
         }
 
         Box(modifier = Modifier.fillMaxSize()) {

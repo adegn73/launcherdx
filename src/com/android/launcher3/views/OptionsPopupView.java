@@ -278,10 +278,17 @@ public class OptionsPopupView<T extends Context & ActivityContext> extends Arrow
         MSDLPlayerWrapper mMSDLPlayerWrapper = MSDLPlayerWrapper.INSTANCE.get(context);
         PreferenceManager2 preferenceManager2 = PreferenceManager2.getInstance(context);
         boolean oldValue = PreferenceCacheExtensionsKt.firstCached(preferenceManager2.getLockHomeScreen());
-        com.patrykmichalik.opto.core.PreferenceExtensionsKt.setBlocking(preferenceManager2.getLockHomeScreen(), !oldValue);
         if (oldValue) {
-            mMSDLPlayerWrapper.playToken(MSDLToken.UNLOCK);
+            // Unlocking re-enables changes to the home screen - confirm it's actually the user
+            // doing this, not an accidental long-press/tap while the screen is locked down.
+            Launcher launcher = Launcher.getLauncher(context);
+            launcher.confirmDeviceCredential(() -> {
+                com.patrykmichalik.opto.core.PreferenceExtensionsKt.setBlocking(
+                        preferenceManager2.getLockHomeScreen(), false);
+                mMSDLPlayerWrapper.playToken(MSDLToken.UNLOCK);
+            });
         } else {
+            com.patrykmichalik.opto.core.PreferenceExtensionsKt.setBlocking(preferenceManager2.getLockHomeScreen(), true);
             mMSDLPlayerWrapper.playToken(MSDLToken.LOCK);
         }
         return true;

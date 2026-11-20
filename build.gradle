@@ -282,6 +282,11 @@ android {
             isDefault true
         }
 
+        launcherdx {
+            applicationId 'dev.adegn73.launcherdx'
+            dimension "channel"
+        }
+
         configureEach {
             resValue("string", "launcher_component", "${applicationId}/app.lawnchair.LawnchairLauncher")
         }
@@ -324,6 +329,11 @@ android {
             res.srcDirs = ["nightly/res"]
         }
 
+        launcherdx {
+            manifest.srcFile "launcherdx/AndroidManifest.xml"
+            res.srcDirs = ["launcherdx/res"]
+        }
+
         lawnWithQuickstepGithub {
             manifest.srcFile "quickstep/AndroidManifest-launcher.xml"
         }
@@ -333,6 +343,10 @@ android {
         }
 
         lawnWithQuickstepPlay {
+            manifest.srcFile "quickstep/AndroidManifest-launcher.xml"
+        }
+
+        lawnWithQuickstepLauncherdx {
             manifest.srcFile "quickstep/AndroidManifest-launcher.xml"
         }
 
@@ -350,6 +364,17 @@ androidComponents {
         def channel = variant.productFlavors.last().second
         variant.outputs.forEach { output ->
             output.outputFileName.set("Lawnchair.${output.versionName.get()}.$channel.${variant.buildType}.apk")
+        }
+
+        // resValue precedence is buildType > productFlavor, so a flavor-level
+        // derived_app_name override loses to the debug/release buildTypes' own - set it here
+        // instead, at the variant level, which outranks both.
+        if (channel == "launcherdx") {
+            def appName = variant.buildType == "debug" ? "LauncherDX (Debug)" : "LauncherDX"
+            variant.resValues.put(
+                variant.makeResValueKey("string", "derived_app_name"),
+                new com.android.build.api.variant.ResValue(appName, null),
+            )
         }
 
         // Lawnchair-TODO: A better way to sync proto file to the IDE preventing missing or outdated result. Please remove if this is the best solution we have right now
