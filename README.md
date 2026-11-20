@@ -9,6 +9,7 @@ LauncherDX is a personal Android launcher, built as a fork of [Lawnchair](https:
 - **Driving Mode** - a fullscreen, car-friendly dashboard that activates automatically when your phone connects to your car's Bluetooth, with a customizable grid of shortcuts, a speedometer, and an optional "Stay awake" setting to keep the screen on while it's showing.
 - **Home screen lock** - lock your layout from the long-press menu to stop accidental drags, deletes, or taps. Locking is instant; unlocking requires confirming your device's screen lock (biometric, PIN, pattern, or password) first, so it can't be undone by accident either.
 - **Hide LauncherDX activities from Recents** - an opt-in setting to keep this launcher's own screens (including a stray entry that could otherwise resurface after "Clear all") out of the system Recents/Overview list.
+- **Paged app drawer** - an alternative "Drawer style" that lays the app drawer out as swipeable grid pages instead of one continuously scrolling list, mirroring how the home screen itself pages between screens (including its own background image with matching parallax).
 - A handful of smaller fixes carried over from the Lawnchair codebase this is built on (backup/restore coverage, widget corner-radius handling, and others).
 
 Everything else - Material You theming, icon packs, search, grid customization, and so on - comes from Lawnchair itself. See the [upstream Lawnchair README](https://github.com/LawnchairLauncher/lawnchair#readme) for the full feature set this is built on.
